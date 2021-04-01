@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COM3D2.XTMasterSlave.Plugin", "CM3D2.XTMasterSlave.Plugin\COM3D2.XTMasterSlave.Plugin.csproj", "{8726B846-D345-4A52-8A65-AE19F246780F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COM3D2.XtMasterSlave.IKO132", "COM3D2.XtMasterSlave.IKO132\COM3D2.XtMasterSlave.IKO132.csproj", "{7E739022-517F-4FDC-A679-8825E2FDFF3B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8726B846-D345-4A52-8A65-AE19F246780F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8726B846-D345-4A52-8A65-AE19F246780F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8726B846-D345-4A52-8A65-AE19F246780F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8726B846-D345-4A52-8A65-AE19F246780F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E739022-517F-4FDC-A679-8825E2FDFF3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E739022-517F-4FDC-A679-8825E2FDFF3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E739022-517F-4FDC-A679-8825E2FDFF3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E739022-517F-4FDC-A679-8825E2FDFF3B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9F793F5-71B3-496D-A694-1ABD661D4184}
+	EndGlobalSection
+EndGlobal
