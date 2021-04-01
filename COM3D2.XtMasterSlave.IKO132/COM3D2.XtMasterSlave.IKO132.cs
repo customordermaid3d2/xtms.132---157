@@ -105,6 +105,9 @@ namespace XtMasterSlave_IK_XDLL
 
                     if (IkXT.IsIkCtrlO117)
                     {
+                        // SetIKSetting(IKAttachParam param);
+                        // IKAttachParam(Maid src_chara = null, Maid target_chara = null)
+
                         ctrl.SetIKSetting(t, AIKCtrl.IKExecTiming.Normal, null, string.Empty, null, Vector3.zero);
                         ctrl.Detach(t);
                         //ctrl.SetIKSetting(t, false, null, -1, string.Empty, null, null, Vector3.zero, false, 0f);
@@ -122,7 +125,7 @@ namespace XtMasterSlave_IK_XDLL
                         //iks.IsTgtAxis
                     }
 
-                    if (iks.MyType != AIKCtrl.IKAttachType.Rotate)
+                    if (iks.attachType != AIKCtrl.IKAttachType.Rotate)
                     {
                         if (IkType >= 0 && IkType != (int)AIKCtrl.IKAttachType.Rotate
                                 && Enum.IsDefined(typeof(AIKCtrl.IKAttachType), IkType))
@@ -156,7 +159,7 @@ namespace XtMasterSlave_IK_XDLL
                     var ikm = ikcm.GetIKSettingData(t);
                     var iks = ikcs.GetIKSettingData(t);
 
-                    if (!(string.IsNullOrEmpty(ikm.curTargetData.Tgt_AttachName) && ikm.curTargetData.Target == null))
+                    if (!(string.IsNullOrEmpty(ikm.curTargetData.tgtAttachName) && ikm.curTargetData.target == null))
                     {
                         //Console.WriteLine("{0} {1} -> {2} {3} {4}", h, t, ikm.MyType, ikm.Tgt_AttachName, ikm.Target);
 
@@ -164,7 +167,7 @@ namespace XtMasterSlave_IK_XDLL
                         {
                             if (ikm.attachType != AIKCtrl.IKAttachType.Rotate)
                             {
-                                iks.ChangeIKType(ikm.MyType);
+                                iks.attachType=ikm.attachType;
                             }
                         }
 
@@ -179,7 +182,19 @@ namespace XtMasterSlave_IK_XDLL
 
                         if (IkXT.IsIkCtrlO117)
                         {
-                            ikcs.SetIKSetting(t, AIKCtrl.IKExecTiming.Normal, ikm.curTargetData.TgtChara, ikm.curTargetData.Tgt_AttachSlot, ikm.curTargetData.Tgt_AttachName, ikm.curTargetData.AxisTgt, ikm.curTargetData.Target, ikm.curTargetData.TgtOffset, ikm.DoAnimation);
+
+                            ikcs.SetIKSetting(new IKAttachParam(master , slave));
+                            /*
+                            ikcs.SetIKSetting(t
+                                , AIKCtrl.IKExecTiming.Normal
+                                , ikm.curTargetData.targetChara
+                                , ikm.curTargetData.tgtAttachSlot
+                                , ikm.curTargetData.tgtAttachName
+                                , ikm.curTargetData.AxisTgt
+                                , ikm.curTargetData.Target
+                                , ikm.curTargetData.TgtOffset
+                                , ikm.DoAnimation);
+                            */
                             //ikcs.SetIKSetting(t, false, ikm.TgtMaid, ikm.Tgt_AttachSlot, ikm.Tgt_AttachName, ikm.AxisTgt, ikm.Target, ikm.TgtOffset, ikm.DoAnimation, ikm.BlendTime);
                             //iks.SetIKSetting(ikm.TgtMaid, ikm.Tgt_AttachSlot, ikm.Tgt_AttachName, ikm.AxisTgt, ikm.Target, ikm.TgtOffset, ikm.DoAnimation, ikm.BlendTime);
                         }
@@ -192,25 +207,26 @@ namespace XtMasterSlave_IK_XDLL
                             //iks.AxisTgt = ikm.AxisTgt;
                         }
 
-                        if (iks.IsPointAttach)
+                        if (iks.isPointAttach)
                         {
-                            iks.curTargetData.TgtOffset = ikm.curTargetData.TgtOffset;
-                            if (h == "右手")
-                                iks.curTargetData.TgtOffset += v3ofs[num_].v3HandROffset;
-                            else
-                                iks.curTargetData.TgtOffset += v3ofs[num_].v3HandLOffset;
+                            iks.curTargetData.tgtOffset = ikm.curTargetData.tgtOffset;
+                            //if (h == "右手")
+                            if (h ==FullBodyIKMgr.IKEffectorType.Hand_R)
+                                iks.curTargetData.tgtOffset += v3ofs[num_].v3HandROffset;
+                            else if(h == FullBodyIKMgr.IKEffectorType.Hand_L)
+                                iks.curTargetData.tgtOffset += v3ofs[num_].v3HandLOffset;
                         }
                         else
                         {
                             Vector3 v3rot = Vector3.zero;
-                            if (h == "右手")
+                            if (h == FullBodyIKMgr.IKEffectorType.Hand_R)
                                 v3rot = v3ofs[num_].v3HandROffsetRot;
-                            else
+                            else if (h == FullBodyIKMgr.IKEffectorType.Hand_L)
                                 v3rot = v3ofs[num_].v3HandLOffsetRot;
 
-                            iks.curTargetData.TgtOffset.x = fixAngle(ikm.curTargetData.TgtOffset.x + v3rot.x);
-                            iks.curTargetData.TgtOffset.y = fixAngle(ikm.curTargetData.TgtOffset.y + v3rot.y);
-                            iks.curTargetData.TgtOffset.z = fixAngle(ikm.curTargetData.TgtOffset.z + v3rot.z);
+                            iks.curTargetData.tgtOffset.x = fixAngle(ikm.curTargetData.tgtOffset.x + v3rot.x);
+                            iks.curTargetData.tgtOffset.y = fixAngle(ikm.curTargetData.tgtOffset.y + v3rot.y);
+                            iks.curTargetData.tgtOffset.z = fixAngle(ikm.curTargetData.tgtOffset.z + v3rot.z);
                         }
                     }
 
@@ -244,7 +260,7 @@ namespace XtMasterSlave_IK_XDLL
 
             HandFootIKCtrl ikdata = slave.fullBodyIK.GetIKCtrl<HandFootIKCtrl>(handName);
             //HandFootIKData ikdata = slave.fullBodyIK.GetIKCtrl<HandFootIKData>(handName);
-            ikdata.CorrectType = HandFootIKCtrl.BorderCorrectType.Bone;
+            ikdata.correctType = HandFootIKCtrl.BorderCorrectType.Bone;
         }
 
         bool needInit = true;
