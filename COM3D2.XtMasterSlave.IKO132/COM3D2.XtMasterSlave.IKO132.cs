@@ -20,15 +20,13 @@ namespace XtMasterSlave_IK_XDLL
         public static bool boAnime = false; //?
         public static bool IKBend = false;  //
 
-        public bool IsNewPointIK(Maid m, FullBodyIKMgr.IKEffectorType hand )//
+        public override bool IsNewPointIK(Maid m, string hand = "右手")
         {
             var ikP = m.body0.fullBodyIK.GetIKCtrl(hand).GetIKSettingData(AIKCtrl.IKAttachType.Point);
-            // AIKCtrl.IKSettingData iksettingData = this.GetIKSettingData(attachType);
-            //var ikP = m.body0.IKCtrl.GetIKData(hand, IKBend).GetIKSettingData(IKCtrlData.IKAttachType.Point);
             return (ikP.attachType == AIKCtrl.IKAttachType.NewPoint);
         }
 
-        public object GetIkPoint(TBody body, FullBodyIKMgr.IKEffectorType hand)//
+        public override object GetIkPoint(TBody body, string hand = "右手")
         {
 #if DEBUG
             if (Input.GetKey(KeyCode.Space))
@@ -53,7 +51,7 @@ namespace XtMasterSlave_IK_XDLL
             return maid.fullBodyIK;
         }
 
-        public object GetIkCtrlPoint(TBody body, FullBodyIKMgr.IKEffectorType hand)//
+        public override object GetIkCtrlPoint(TBody body, string hand = "右手")
         {
 #if DEBUG
             if (Input.GetKey(KeyCode.Space))
@@ -84,14 +82,12 @@ namespace XtMasterSlave_IK_XDLL
 
         public override void IkClear(Maid tgt, XtMasterSlave.MsLinkConfig mscfg)
         {
-            //List<string> listHand = new List<string> { "右手", "左手" };
-            List<FullBodyIKMgr.IKEffectorType> listHand = new List<FullBodyIKMgr.IKEffectorType>
-                                    {FullBodyIKMgr.IKEffectorType.Hand_L, FullBodyIKMgr.IKEffectorType.Hand_R };
+            List<string> listHand = new List<string> { "右手", "左手" };
             IkClear(tgt, listHand, mscfg);
         }
 
-        //public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg, IKCtrlData.IKAttachType IkType = (IKCtrlData.IKAttachType)(-1))
-        public void IkClear(Maid tgt, List<FullBodyIKMgr.IKEffectorType> listHand, XtMasterSlave.MsLinkConfig mscfg, int IkType = (-1))
+        //public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg, AIKCtrl.IKAttachType IkType = (AIKCtrl.IKAttachType)(-1))
+        public override void IkClear(Maid tgt, List<string> listHand, XtMasterSlave.MsLinkConfig mscfg, int IkType = (-1))
         {
             List<AIKCtrl.IKAttachType> listTypes = new List<AIKCtrl.IKAttachType>
                                     { AIKCtrl.IKAttachType.NewPoint, AIKCtrl.IKAttachType.Rotate };
@@ -105,10 +101,14 @@ namespace XtMasterSlave_IK_XDLL
 
                     if (IkXT.IsIkCtrlO117)
                     {
-                        // SetIKSetting(IKAttachParam param);
-                        // IKAttachParam(Maid src_chara = null, Maid target_chara = null)
 
-                        ctrl.SetIKSetting(new IKAttachParam( null, tgt));
+                        IKAttachParam ikAttachParam = new IKAttachParam(null, tgt);
+                        ikAttachParam.attachType = t;
+                        ikAttachParam.execTiming = AIKCtrl.IKExecTiming.Normal;
+                        ikAttachParam.offset = Vector3.zero;
+
+
+                        ctrl.SetIKSetting(ikAttachParam);
                         //ctrl.SetIKSetting(t, AIKCtrl.IKExecTiming.Normal, null, string.Empty, null, Vector3.zero);
                         ctrl.Detach();
                         //ctrl.SetIKSetting(t, false, null, -1, string.Empty, null, null, Vector3.zero, false, 0f);
@@ -131,23 +131,25 @@ namespace XtMasterSlave_IK_XDLL
                         if (IkType >= 0 && IkType != (int)AIKCtrl.IKAttachType.Rotate
                                 && Enum.IsDefined(typeof(AIKCtrl.IKAttachType), IkType))
                         {
-                            iks.attachType=(AIKCtrl.IKAttachType)IkType;
+                            iks.attachType=((AIKCtrl.IKAttachType)IkType);
                         }
                         else
                         {
                             if (mscfg != null)
-                                iks.attachType = GetDefType(mscfg);/*fix v5.0
+                                iks.attachType=(GetDefType(mscfg));/*fix v5.0
                             else
-                                iks.ChangePointType(IKCtrlData.IKAttachType.NewPoint);*/
+                                iks.ChangePointType(AIKCtrl.IKAttachType.NewPoint);*/
                         }
                     }
                 });
             });
         }
 
-        public override void CopyHandIK(Maid master, Maid slave, XtMasterSlave.v3Offsets[] v3ofs, int num_)
+
+
+public override void CopyHandIK(Maid master, Maid slave, XtMasterSlave.v3Offsets[] v3ofs, int num_)
         {
-            List<FullBodyIKMgr.IKEffectorType> listHand = new List<FullBodyIKMgr.IKEffectorType> { FullBodyIKMgr.IKEffectorType.Hand_R, FullBodyIKMgr.IKEffectorType.Hand_L };
+            List<string> listHand = new List<string> { "右手", "左手" };
             List<AIKCtrl.IKAttachType> listTypes = new List<AIKCtrl.IKAttachType>
                                     { AIKCtrl.IKAttachType.NewPoint, AIKCtrl.IKAttachType.Rotate };
 
@@ -162,13 +164,13 @@ namespace XtMasterSlave_IK_XDLL
 
                     if (!(string.IsNullOrEmpty(ikm.curTargetData.tgtAttachName) && ikm.curTargetData.target == null))
                     {
-                        //Console.WriteLine("{0} {1} -> {2} {3} {4}", h, t, ikm.MyType, ikm.Tgt_AttachName, ikm.Target);
+                        //Console.WriteLine("{0} {1} -> {2} {3} {4}", h, t, ikm.attachType, ikm.Tgt_AttachName, ikm.Target);
 
                         if (iks.attachType != AIKCtrl.IKAttachType.Rotate)
                         {
                             if (ikm.attachType != AIKCtrl.IKAttachType.Rotate)
                             {
-                                iks.attachType=ikm.attachType;
+                                iks.attachType=(ikm.attachType);
                             }
                         }
 
@@ -183,19 +185,33 @@ namespace XtMasterSlave_IK_XDLL
 
                         if (IkXT.IsIkCtrlO117)
                         {
-
-                            ikcs.SetIKSetting(new IKAttachParam(master , slave));
+                            // befor
                             /*
                             ikcs.SetIKSetting(t
                                 , AIKCtrl.IKExecTiming.Normal
                                 , ikm.curTargetData.targetChara
                                 , ikm.curTargetData.tgtAttachSlot
                                 , ikm.curTargetData.tgtAttachName
-                                , ikm.curTargetData.AxisTgt
-                                , ikm.curTargetData.Target
-                                , ikm.curTargetData.TgtOffset
-                                , ikm.DoAnimation);
+                                , ikm.curTargetData.axisTarget
+                                , ikm.curTargetData.target
+                                , ikm.curTargetData.tgtOffset
+                                , ikm.doAnimation);
                             */
+
+                            // after
+                            IKAttachParam ikAttachParam = new IKAttachParam( null, master);
+                            ikAttachParam.attachType = t;
+                            ikAttachParam.execTiming = AIKCtrl.IKExecTiming.Normal;
+                            ikAttachParam.targetChara = ikm.curTargetData.targetChara;
+                            ikAttachParam.slotName = ikm.curTargetData.tgtAttachName;
+                            ikAttachParam.axisBone = ikm.curTargetData.axisTarget;
+                            ikAttachParam.attachTarget = ikm.curTargetData.target;
+                            ikAttachParam.offset = ikm.curTargetData.tgtOffset;
+                            ikAttachParam.doAnimation = ikm.doAnimation;
+
+                            ikcs.SetIKSetting(ikAttachParam);
+
+                            //ikcs.SetIKSetting(t, AIKCtrl.IKExecTiming.Normal, ikm.curTargetData.targetChara, ikm.curTargetData.tgtAttachSlot, ikm.curTargetData.Tgt_AttachName, ikm.curTargetData.AxisTgt, ikm.curTargetData.Target, ikm.curTargetData.TgtOffset, ikm.DoAnimation);
                             //ikcs.SetIKSetting(t, false, ikm.TgtMaid, ikm.Tgt_AttachSlot, ikm.Tgt_AttachName, ikm.AxisTgt, ikm.Target, ikm.TgtOffset, ikm.DoAnimation, ikm.BlendTime);
                             //iks.SetIKSetting(ikm.TgtMaid, ikm.Tgt_AttachSlot, ikm.Tgt_AttachName, ikm.AxisTgt, ikm.Target, ikm.TgtOffset, ikm.DoAnimation, ikm.BlendTime);
                         }
@@ -211,18 +227,17 @@ namespace XtMasterSlave_IK_XDLL
                         if (iks.isPointAttach)
                         {
                             iks.curTargetData.tgtOffset = ikm.curTargetData.tgtOffset;
-                            //if (h == "右手")
-                            if (h ==FullBodyIKMgr.IKEffectorType.Hand_R)
+                            if (h == "右手")
                                 iks.curTargetData.tgtOffset += v3ofs[num_].v3HandROffset;
-                            else if(h == FullBodyIKMgr.IKEffectorType.Hand_L)
+                            else
                                 iks.curTargetData.tgtOffset += v3ofs[num_].v3HandLOffset;
                         }
                         else
                         {
                             Vector3 v3rot = Vector3.zero;
-                            if (h == FullBodyIKMgr.IKEffectorType.Hand_R)
+                            if (h == "右手")
                                 v3rot = v3ofs[num_].v3HandROffsetRot;
-                            else if (h == FullBodyIKMgr.IKEffectorType.Hand_L)
+                            else
                                 v3rot = v3ofs[num_].v3HandLOffsetRot;
 
                             iks.curTargetData.tgtOffset.x = fixAngle(ikm.curTargetData.tgtOffset.x + v3rot.x);
@@ -239,12 +254,32 @@ namespace XtMasterSlave_IK_XDLL
         
         public override void SetHandIKRotate(string handName, Maid master, Maid slave, string boneTgtname, Vector3 v3HandLOffsetRot)
         {
-            slave.IKTargetToBone(handName, master, boneTgtname, v3HandLOffsetRot, AIKCtrl.IKAttachType.Rotate, false, boAnime, AIKCtrl.IKExecTiming.Normal);
+            IKAttachParam ikAttachParam = new IKAttachParam(master, null);
+            ikAttachParam.targetBoneName = boneTgtname;
+            ikAttachParam.offset = v3HandLOffsetRot;
+            ikAttachParam.attachType = AIKCtrl.IKAttachType.Rotate;
+            ikAttachParam.doAnimation = boAnime;
+            ikAttachParam.execTiming = AIKCtrl.IKExecTiming.Normal;
 
-            //slave.IKTargetToBone(handName, master, boneTgtname, v3HandLOffsetRot, IKCtrlData.IKAttachType.Rotate, false, 0f, boAnime, false);
+            slave.body0.fullBodyIK.IKAttach(handName, ikAttachParam);
+
+            // befor
+            /*
+            slave.IKTargetToBone(
+                  handName
+                , master
+                , boneTgtname
+                , v3HandLOffsetRot
+                , AIKCtrl.IKAttachType.Rotate
+                , false
+                , boAnime
+                , AIKCtrl.IKExecTiming.Normal);
+            */
+            /**/
+            //slave.IKTargetToBone(handName, master, boneTgtname, v3HandLOffsetRot, AIKCtrl.IKAttachType.Rotate, false, 0f, boAnime, false);
         }
 
-        public void SetHandIKTarget(XtMasterSlave.MsLinkConfig mscfg, FullBodyIKMgr.IKEffectorType handName, Maid master, Maid slave, int slot_no, string attach_name, Transform target, Vector3 v3HandLOffset)
+        public override void SetHandIKTarget(XtMasterSlave.MsLinkConfig mscfg, string handName, Maid master, Maid slave, int slot_no, string attach_name, Transform target, Vector3 v3HandLOffset)
         {
             /*if (needInit)
             {
@@ -256,11 +291,18 @@ namespace XtMasterSlave_IK_XDLL
                     IKInit4OldPoint(slave);
 #endif
             }*/
-            IKAttachParam param;// GetDefType(mscfg), AIKCtrl.IKExecTiming.Normal, master, slot_no, attach_name, null, target, v3HandLOffset, boAnime
-            slave.fullBodyIK.GetIKCtrl(handName).SetIKSetting(param);
+            IKAttachParam ikAttachParam = new IKAttachParam(slave, master);
+            ikAttachParam.attachType = GetDefType(mscfg);
+            ikAttachParam.execTiming = AIKCtrl.IKExecTiming.Normal;
+            ikAttachParam.attachIKName = attach_name;
+            ikAttachParam.attachTarget = target;
+            ikAttachParam.offset = v3HandLOffset;
+            ikAttachParam.doAnimation = boAnime;
+
+            slave.fullBodyIK.GetIKCtrl(handName).SetIKSetting(ikAttachParam);
+            //slave.fullBodyIK.GetIKCtrl(handName).SetIKSetting(GetDefType(mscfg), AIKCtrl.IKExecTiming.Normal, master, slot_no, attach_name, null, target, v3HandLOffset, boAnime);
 
             HandFootIKCtrl ikdata = slave.fullBodyIK.GetIKCtrl<HandFootIKCtrl>(handName);
-            //HandFootIKData ikdata = slave.fullBodyIK.GetIKCtrl<HandFootIKData>(handName);
             ikdata.correctType = HandFootIKCtrl.BorderCorrectType.Bone;
         }
 
@@ -587,15 +629,15 @@ namespace XtMasterSlave_IK_XDLL
             eff.rotationWeight = 0f;
         }
 
-        public override object GetIKCmo(TBody body, FullBodyIKMgr.IKEffectorType hand)
+        public override object GetIKCmo(TBody body, string hand = "右手")
         {
-            return body.fullBodyIK.GetIKCtrl(hand).IKCmo;
+            return null;//body.fullBodyIK.GetIKCtrl(hand).IKCmo;
 
             /*
             if (hand == "右手")
-                return body.IKCtrl.GetIKData("右手").IKCmo;
+                return body.fullBodyIK.GetIKCtrl("右手").IKCmo;
             else
-                return body.IKCtrl.GetIKData("左手").IKCmo;
+                return body.fullBodyIK.GetIKCtrl("左手").IKCmo;
                 */
         }
 
@@ -605,7 +647,7 @@ namespace XtMasterSlave_IK_XDLL
             return true;
         }
 
-        public bool GetIKCmoPosRot(TBody body, out Vector3 pos, out Quaternion rot, FullBodyIKMgr.IKEffectorType hand)
+        public override bool GetIKCmoPosRot(TBody body, out Vector3 pos, out Quaternion rot, string hand = "右手")
         {
             var ctrl = body.fullBodyIK.GetIKCtrl(hand);
             bool proc = false;
@@ -613,7 +655,7 @@ namespace XtMasterSlave_IK_XDLL
             pos = Vector3.zero;
             rot = Quaternion.identity;
 
-            var data = ctrl.GetIKSettingData(IKCtrl.IKAttachType.Point);
+            var data = ctrl.GetIKSettingData(AIKCtrl.IKAttachType.Point);
             if (data.curTargetData.target != null)
             {
                 pos = data.curTargetData.target.position;
@@ -622,10 +664,7 @@ namespace XtMasterSlave_IK_XDLL
             }
             else if (data.curTargetData.tgtAttachName != string.Empty)
             {
-                if (data.curTargetData.targetChara != null 
-                    && data.curTargetData.targetChara.body0 != null 
-                    && data.curTargetData.tgtAttachSlot >= 0 
-                    && data.curTargetData.targetChara.body0.goSlot[data.curTargetData.tgtAttachSlot].morph != null)
+                if (data.curTargetData.targetChara != null && data.curTargetData.targetChara.body0 != null && data.curTargetData.tgtAttachSlot >= 0 && data.curTargetData.targetChara.body0.goSlot[data.curTargetData.tgtAttachSlot].morph != null)
                 {
                     Vector3 vector;
                     data.curTargetData.targetChara.body0.goSlot[data.curTargetData.tgtAttachSlot].morph.GetAttachPoint(data.curTargetData.tgtAttachName, out pos, out rot, out vector, false);
@@ -640,7 +679,7 @@ namespace XtMasterSlave_IK_XDLL
             return proc;
         }
 
-        public bool IKCmoUpdate(TBody body, Transform trh, Vector3 offset, FullBodyIKMgr.IKEffectorType hand)
+        public override bool IKCmoUpdate(TBody body, Transform trh, Vector3 offset, string hand = "右手")
         {
             var ctrl = body.fullBodyIK.GetIKCtrl(hand);
             /*ctrl.MyIKCtrl.GetType().GetProperty("IsUpdateEnd").SetValue(ctrl.MyIKCtrl, true, null);
@@ -654,7 +693,7 @@ namespace XtMasterSlave_IK_XDLL
 
             if (proc)
             {
-                ctrl.IKCmo.Porc(trh.parent.parent, trh.parent, trh, pos, rot * offset, ctrl);
+                //ctrl.IKCmo.Porc(trh.parent.parent, trh.parent, trh, pos, rot * offset, ctrl);
                 return true;
             }
             return false;

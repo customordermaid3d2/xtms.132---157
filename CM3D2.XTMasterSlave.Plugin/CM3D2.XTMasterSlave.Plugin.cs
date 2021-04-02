@@ -21,6 +21,7 @@ using static ExtensionMethods.MyExtensions;
 using static ExtensionMethods.ComExt;
 using System.IO;
 using UnityEngine.SceneManagement;
+using kt.ik;
 
 // コンパイル用コマンド　同梱のbat参照　※要VS2017(C#7.0)
 
@@ -10229,8 +10230,29 @@ namespace ExtensionMethods
 
         static void IKTargetClearOld(this Maid m)
         {
-            m.IKTargetToAttachPoint("左手", null, "body", string.Empty, Vector3.zero);
-            m.IKTargetToAttachPoint("右手", null, "body", string.Empty, Vector3.zero);
+            IKAttachParam ikAttachParam = new IKAttachParam(m, null);
+            ikAttachParam.slotName = "body";
+            ikAttachParam.attachPointName = string.Empty;
+            ikAttachParam.offset = Vector3.zero;
+            ikAttachParam.attachType = !m.body0.IsCrcBody ? AIKCtrl.IKAttachType.Point : AIKCtrl.IKAttachType.NewPoint;
+            if (ikAttachParam.attachType == AIKCtrl.IKAttachType.NewPoint)
+            {
+                ikAttachParam.posOffsetType = AIKCtrl.PosOffsetType.OffsetTarget;
+            }
+
+            ikAttachParam.blendTime = ikAttachParam.srcChara.fullBodyIK.blendTime;
+            ikAttachParam.doAnimation = false;
+            ikAttachParam.bodyPull = ikAttachParam.attachType == AIKCtrl.IKAttachType.NewPoint;
+            if (ikAttachParam.attachType == AIKCtrl.IKAttachType.NewPoint)
+            {
+                ikAttachParam.bodyPull = true; //!tagData.IsValid("pull_off");
+            }
+
+            m.body0.fullBodyIK.IKAttach("左手", ikAttachParam);
+            m.body0.fullBodyIK.IKAttach("右手", ikAttachParam);
+
+            //m.IKTargetToAttachPoint("左手", null, "body", string.Empty, Vector3.zero);
+            //m.IKTargetToAttachPoint("右手", null, "body", string.Empty, Vector3.zero);
         }
 
         static Assembly LoadIkDll(string dllname)
@@ -10296,7 +10318,7 @@ namespace ExtensionMethods
             public static bool IsIkMgr159 { get { return _typIKM159 != null; } }
 
             // com3d2 1.17~
-            public static Type _typIKO117 = Assembly.Load("Assembly-CSharp").GetType("IKCtrlData");
+            public static Type _typIKO117 = Assembly.Load("Assembly-CSharp").GetType("AIKCtrl");
             public static bool IsIkCtrlO117 { get { return _typIKO117 != null; } }
 
             // com3d2 1.18~
@@ -10314,7 +10336,7 @@ namespace ExtensionMethods
                 } }
 
             // com3d2 1.32~
-            public static Type _typIKO132 = Assembly.Load("Assembly-CSharp").GetType("IKCtrlData")?.GetNestedType("IKSettingData");
+            public static Type _typIKO132 = Assembly.Load("Assembly-CSharp").GetType("AIKCtrl")?.GetNestedType("IKSettingData");
             public static bool IsIkCtrlO132 { get { return _typIKO132 != null; } }
 
             public static bool IsNewIK { get { return IsIkCtrlO117 || IsIkMgr159; } }

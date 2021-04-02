@@ -32,16 +32,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\COM3D2_Plugin\_lib\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\_lib\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\COM3D2_Plugin\_lib\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\_lib\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="JsonFx.Json">
-      <HintPath>..\..\..\COM3D2_Plugin\_lib\JsonFx.Json.dll</HintPath>
+      <HintPath>..\..\_lib\JsonFx.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PluginExt">
       <HintPath>..\..\..\COM3D2_Plugin\_lib\PluginExt.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,10 +55,12 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\COM3D2_Plugin\_lib\UnityEngine.dll</HintPath>
+      <HintPath>..\..\_lib\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityInjector">
-      <HintPath>..\..\..\COM3D2_Plugin\_lib\UnityInjector.dll</HintPath>
+      <HintPath>..\..\_lib\UnityInjector.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
