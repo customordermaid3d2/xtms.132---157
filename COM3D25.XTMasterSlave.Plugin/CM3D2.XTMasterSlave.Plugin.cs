@@ -10,9 +10,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 //
 using UnityEngine;
-//using UnityInjector.Attributes;
+using UnityInjector.Attributes;
 
-//using PluginExt;
+using PluginExt;
 using CM3D2.XtMasterSlave.Plugin;
 using VYMModule;
 
@@ -20,25 +20,32 @@ using ExtensionMethods;
 using static ExtensionMethods.MyExtensions;
 using static ExtensionMethods.ComExt;
 using System.IO;
-//using UnityEngine.SceneManagement;
-//using kt.ik;
-using BepInEx;
+using UnityEngine.SceneManagement;
+using kt.ik;
+//using BepInEx;
 
 // コンパイル用コマンド　同梱のbat参照　※要VS2017(C#7.0)
 
 namespace CM3D2.XtMasterSlave.Plugin
 {
+    public class MyAttribute
+    {
+        public const string PLAGIN_NAME = "XtMasterSlave";
+        public const string PLAGIN_VERSION = "22.02.22";
+        public const string PLAGIN_FULL_NAME = "COM3D2.XtMasterSlave.Plugin";
+    }
+
 
 #if COM3D2
     [PluginFilter("COM3D2x64"), PluginFilter("COM3D2OHx64"),
     PluginName("COM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.5.0")]
-
+   //     [BepInPlugin(MyAttribute.PLAGIN_FULL_NAME, MyAttribute.PLAGIN_NAME, MyAttribute.PLAGIN_VERSION)]// 버전 규칙 잇음. 반드시 2~4개의 숫자구성으로 해야함. 미준수시 못읽어들임
 #else
     [PluginFilter("CM3D2x64"), PluginFilter("CM3D2x86"), PluginFilter("CM3D2VRx64"),
     PluginFilter("CM3D2OHx64"), PluginFilter("CM3D2OHx86"), PluginFilter("CM3D2OHVRx64"),
     PluginName("CM3D2.XtMasterSlave.Plugin"), PluginVersion("0.0.5.0")]
 #endif
-    public class XtMasterSlave : BaseUnityPlugin //ExPluginBase
+    public class XtMasterSlave : ExPluginBase
     {
         #region 定数宣言
         public readonly static string PLUGIN_NAME = "XtMasterSlave";
@@ -4631,6 +4638,10 @@ namespace CM3D2.XtMasterSlave.Plugin
                         }
                         else
                         {
+                            if (slave.body0._ikp()==null)
+                            {
+                                UnityEngine.Debug.LogWarning("slave.body0._ikp() null");
+                            }
                             //Maid.IKTargetToAttachPointより
                             //if (slave.body0.tgtHandL_AttachName != master.body0.tgtHandL_AttachName)
                             {
@@ -10355,7 +10366,7 @@ namespace ExtensionMethods
                     {
                         Console.WriteLine("XtMS: 新IKモードで動作開始(IKCtrl v1.32)");
 #if COM3D2only
-                        Assembly asm = LoadIkDll("COM3D2.XtMasterSlave.IKO132.xdll");
+                        Assembly asm = LoadIkDll("COM3D25.XtMasterSlave.IKO132.dll");
 #else
                         Assembly asm = LoadIkDll("CM3D2.XtMasterSlave.IKO132.xdll");
 #endif
