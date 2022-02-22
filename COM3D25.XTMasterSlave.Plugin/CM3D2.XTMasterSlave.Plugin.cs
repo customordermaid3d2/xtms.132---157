@@ -4661,6 +4661,15 @@ namespace CM3D2.XtMasterSlave.Plugin
                             }
                         }
 
+                        // TODO :
+                        /*
+[Error  : Unity Log] NullReferenceException: Object reference not set to an instance of an object
+Stack trace:
+ExtensionMethods.MyExtensions+SetIK.set_tgtMaidL (.Maid value)
+CM3D2.XtMasterSlave.Plugin.XtMasterSlave.AtccHand2HandL2 (.Maid master, .Maid slave, Vector3 v3HandLOffset, Vector3 v3HandLOffsetRot, CM3D2.XtMasterSlave.Plugin.MsLinkConfig mscfg)
+CM3D2.XtMasterSlave.Plugin.XtMasterSlave+MsLinks.linkProc ()
+CM3D2.XtMasterSlave.Plugin.XtMasterSlave.Update ()
+                         */
                         if (cfg_.doIKTargetMHand)
                         {
                             if (string.IsNullOrEmpty(slave.body0._ikp().tgtHandR_AttachName) && slave.body0._ikp().tgtHandR == null)
